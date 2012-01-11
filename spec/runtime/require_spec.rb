@@ -224,6 +224,23 @@ describe "Bundler.require" do
         R
         err.should == 'ZOMG LOAD ERROR'
       end
+
+      it "should dump other errors and not die on namespace" do
+        build_gem "busted-dash", :to_system => true do |s|
+          s.write "lib/busted-dash.rb", <<-L
+            raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
+          L
+        end
+
+        install_gemfile <<-G
+          gem "busted-dash"
+        G
+
+        load_error_run <<-R, 'inotify_init'
+          Bundler.require
+        R
+        err.should == 'ZOMG FUNCTION NOT FOUND'
+      end
     end
   end
 end
