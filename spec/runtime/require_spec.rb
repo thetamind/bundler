@@ -223,7 +223,42 @@ describe "Bundler.require" do
       load_error_run <<-R, 'no_such_file_omg'
         Bundler.require
       R
+      out.should == 'hi'
       err.should == 'ZOMG LOAD ERROR'
+    end
+  end
+
+  describe "with busted namespaced gems" do
+    it "should be busted" do
+      build_gem "busted-require", :to_system => true do |s|
+        s.write "lib/busted/require.rb", "require 'no_such_file_x'"
+      end
+
+      install_gemfile <<-G
+        gem "busted-require"
+      G
+      load_error_run <<-R, 'no_such_file_x'
+        Bundler.require
+      R
+      out.should == 'hi'
+      err.should == 'ZOMG LOAD ERROR'
+    end
+
+    it "should not swallow unknown load errors" do
+      build_gem "busted-dash", :to_system => true do |s|
+        s.write "lib/busted/dash.rb", <<-L
+          raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
+        L
+      end
+
+      install_gemfile <<-G
+        gem "busted-dash"
+      G
+      load_error_run <<-R, 'inotify_init'
+        Bundler.require
+      R
+      out.should == 'hi'
+      err.should == 'ZOMG FUNCTION NOT FOUND'
     end
   end
 end
