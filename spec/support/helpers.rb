@@ -44,8 +44,13 @@ module Spec
         begin
           #{ruby}
         rescue LoadError => e
-          $stderr.puts "ZOMG LOAD ERROR" if e.message.include?("-- #{name}")
-          $stderr.puts "ZOMG FUNCTION NOT FOUND" if e.message.include?("Function '#{name}' not found in")
+          if e.message.include?("-- #{name}")
+            $stderr.puts("ZOMG LOAD ERROR")
+          #elsif e.message.include?("Function '#{name}' not found in")
+          #  $stderr.puts("ZOMG FUNCTION NOT FOUND")
+          else
+            $stderr.puts(e.message)
+          end
         end
       RUBY
       opts = args.last.is_a?(Hash) ? args.pop : {}
