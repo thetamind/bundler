@@ -58,6 +58,7 @@ module Bundler
         next unless ((dep.groups & groups).any? && dep.current_platform?)
 
         required_file = nil
+        $stderr.puts "DEPENDENCY: #{dep.name} - autorequire: #{dep.autorequire}"
 
         begin
           # Loop through all the specified autorequires for the
@@ -65,21 +66,29 @@ module Bundler
           # as the autorequire.
           Array(dep.autorequire || dep.name).each do |file|
             required_file = file
+            $stderr.puts "requiring file: #{file}"
             Kernel.require file
+            $stderr.puts "SUCCESS: #{file}"
           end
         rescue LoadError => e
+          $stderr.puts "load error: #{e.message}"
           if dep.autorequire.nil? && dep.name.include?('-')
             begin
               namespaced_file = dep.name.gsub('-', '/')
+              $stderr.puts "requiring namespaced file: #{namespaced_file}"
               Kernel.require namespaced_file
             rescue LoadError
+              $stderr.puts "namespaced load error: #{e.message}"
               REGEXPS.find { |r| r =~ e.message }
+              $stderr.puts "found message: #{$1}"
               raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
             end
           else
             REGEXPS.find { |r| r =~ e.message }
+            $stderr.puts "found message: #{$1}"
             raise if dep.autorequire || $1 != required_file
           end
+          $stderr.puts "END: #{dep.name}"
         end
       end
     end

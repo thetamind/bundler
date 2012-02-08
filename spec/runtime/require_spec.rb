@@ -210,7 +210,7 @@ describe "Bundler.require" do
     end
 
     describe "with busted gems" do
-      it "should be busted" do
+      it "should be busted", focused: true do
         build_gem "busted_require", :to_system => true do |s|
           s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
         end
@@ -227,16 +227,18 @@ describe "Bundler.require" do
 
       it "should dump other errors and not die on namespace", focused: true do
         build_gem "busted-require", :to_system => true do |s|
-          s.write "lib/busted/require.rb", <<-L
+          s.write "lib/busted-require.rb", <<-L
+            $stderr.puts "HELLO FROM INSIDE GEM"
+            require 'no-such-fileOMG'
             raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
           L
         end
 
         install_gemfile <<-G
-          gem "busted-require", require: 'busted/require'
+          gem "busted-require"
         G
-
-        load_error_run <<-R, 'inotify_init'
+        # run "Bundler.require"
+        load_error_run <<-R, 'no-such-fileOMG'
           Bundler.require
         R
         err.should == 'ZOMG LOAD ERROR'
