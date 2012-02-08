@@ -228,7 +228,6 @@ describe "Bundler.require" do
       it "should dump unknown load errors" do
         build_gem "busted_require", :to_system => true do |s|
           s.write "lib/busted_require.rb", <<-L
-              $stderr.puts "HELLO FROM INSIDE GEM"
               raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
           L
         end
@@ -277,7 +276,6 @@ describe "Bundler.require" do
         it "should dump unknown load errors" do
           build_gem "busted-require", :to_system => true do |s|
             s.write "lib/busted-require.rb", <<-L
-              $stderr.puts "HELLO FROM INSIDE GEM"
               raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
             L
           end
@@ -295,7 +293,6 @@ describe "Bundler.require" do
         it "should dump unknown load errors when auto namespacing" do
           build_gem "busted-require", :no_default => true, :to_system => true do |s|
             s.write "lib/busted/require.rb", <<-L
-              $stderr.puts "HELLO FROM INSIDE GEM"
               raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
             L
           end
