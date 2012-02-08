@@ -85,7 +85,7 @@ module Bundler
               $stderr.puts "namespaced load error: #{e.message}"
               REGEXPS.find { |r| r =~ e.message }
               $stderr.puts "found message: #{$1}"
-              raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
+              raise if dep.autorequire || $1.nil? || $1.gsub('-', '/') != namespaced_file
             end
           else
             $stderr.puts "did not raise: #{dep.autorequire}"
