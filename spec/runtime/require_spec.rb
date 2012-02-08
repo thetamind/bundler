@@ -209,7 +209,7 @@ describe "Bundler.require" do
       out.should eq("two_not_loaded\none\ntwo")
     end
 
-    describe "with busted gems", focused: true do
+    describe "with busted gems" do
       it "should be busted" do
         build_gem "busted_require", :to_system => true do |s|
           s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
@@ -243,7 +243,7 @@ describe "Bundler.require" do
       end
 
       describe "with dashes" do
-        it "should be busted", focused: true do
+        it "should be busted" do
           build_gem "busted-require", :to_system => true do |s|
             s.write "lib/busted-require.rb", "require 'no_such_file_omg'"
           end
@@ -258,7 +258,7 @@ describe "Bundler.require" do
           err.should == 'ZOMG LOAD ERROR'
         end
 
-        it "should be busted when auto namespacing", focused: true do
+        it "should be busted when auto namespacing" do
           build_gem "busted-require", :no_default => true, :to_system => true do |s|
             s.write "lib/busted/require.rb", "require 'no_such_file_omg'"
           end
