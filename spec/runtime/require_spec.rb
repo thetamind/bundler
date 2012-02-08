@@ -208,32 +208,81 @@ describe "Bundler.require" do
       run "Bundler.require"
       out.should eq("two_not_loaded\none\ntwo")
     end
+  end
 
-    describe "with busted gems" do
+  describe "with busted gems" do
+    it "should be busted" do
+      build_gem "busted_require", :to_system => true do |s|
+        s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
+      end
+
+      install_gemfile <<-G
+          gem "busted_require"
+      G
+
+      load_error_run <<-R, 'no_such_file_omg'
+          Bundler.require
+      R
+      err.should == 'ZOMG LOAD ERROR'
+    end
+
+    it "should dump unknown load errors" do
+      build_gem "busted_require", :to_system => true do |s|
+        s.write "lib/busted_require.rb", <<-L
+              raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
+        L
+      end
+
+      install_gemfile <<-G
+            gem "busted_require"
+      G
+      # run "Bundler.require"
+      load_error_run <<-R, 'inotify_init'
+            Bundler.require
+      R
+      err.should == 'ZOMG FUNCTION NOT FOUND'
+    end
+
+    describe "with dashes" do
       it "should be busted" do
-        build_gem "busted_require", :to_system => true do |s|
-          s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
+        build_gem "busted-require", :to_system => true do |s|
+          s.write "lib/busted-require.rb", "require 'no_such_file_omg'"
         end
 
         install_gemfile <<-G
-          gem "busted_require"
+            gem "busted-require"
         G
 
         load_error_run <<-R, 'no_such_file_omg'
-          Bundler.require
+            Bundler.require
+        R
+        err.should == 'ZOMG LOAD ERROR'
+      end
+
+      it "should be busted when auto namespacing" do
+        build_gem "busted-require", :no_default => true, :to_system => true do |s|
+          s.write "lib/busted/require.rb", "require 'no_such_file_omg'"
+        end
+
+        install_gemfile <<-G
+            gem "busted-require"
+        G
+
+        load_error_run <<-R, 'no_such_file_omg'
+            Bundler.require
         R
         err.should == 'ZOMG LOAD ERROR'
       end
 
       it "should dump unknown load errors" do
-        build_gem "busted_require", :to_system => true do |s|
-          s.write "lib/busted_require.rb", <<-L
+        build_gem "busted-require", :to_system => true do |s|
+          s.write "lib/busted-require.rb", <<-L
               raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
           L
         end
 
         install_gemfile <<-G
-            gem "busted_require"
+            gem "busted-require"
         G
         # run "Bundler.require"
         load_error_run <<-R, 'inotify_init'
@@ -242,70 +291,21 @@ describe "Bundler.require" do
         err.should == 'ZOMG FUNCTION NOT FOUND'
       end
 
-      describe "with dashes" do
-        it "should be busted" do
-          build_gem "busted-require", :to_system => true do |s|
-            s.write "lib/busted-require.rb", "require 'no_such_file_omg'"
-          end
-
-          install_gemfile <<-G
-            gem "busted-require"
-          G
-
-          load_error_run <<-R, 'no_such_file_omg'
-            Bundler.require
-          R
-          err.should == 'ZOMG LOAD ERROR'
-        end
-
-        it "should be busted when auto namespacing" do
-          build_gem "busted-require", :no_default => true, :to_system => true do |s|
-            s.write "lib/busted/require.rb", "require 'no_such_file_omg'"
-          end
-
-          install_gemfile <<-G
-            gem "busted-require"
-          G
-
-          load_error_run <<-R, 'no_such_file_omg'
-            Bundler.require
-          R
-          err.should == 'ZOMG LOAD ERROR'
-        end
-
-        it "should dump unknown load errors" do
-          build_gem "busted-require", :to_system => true do |s|
-            s.write "lib/busted-require.rb", <<-L
+      it "should dump unknown load errors when auto namespacing" do
+        build_gem "busted-require", :no_default => true, :to_system => true do |s|
+          s.write "lib/busted/require.rb", <<-L
               raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
-            L
-          end
-
-          install_gemfile <<-G
-            gem "busted-require"
-          G
-          # run "Bundler.require"
-          load_error_run <<-R, 'inotify_init'
-            Bundler.require
-          R
-          err.should == 'ZOMG FUNCTION NOT FOUND'
+          L
         end
 
-        it "should dump unknown load errors when auto namespacing" do
-          build_gem "busted-require", :no_default => true, :to_system => true do |s|
-            s.write "lib/busted/require.rb", <<-L
-              raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
-            L
-          end
-
-          install_gemfile <<-G
+        install_gemfile <<-G
             gem "busted-require"
-          G
-          # run "Bundler.require"
-          load_error_run <<-R, 'inotify_init'
+        G
+        # run "Bundler.require"
+        load_error_run <<-R, 'inotify_init'
             Bundler.require
-          R
-          err.should == 'ZOMG FUNCTION NOT FOUND'
-        end
+        R
+        err.should == 'ZOMG FUNCTION NOT FOUND'
       end
     end
   end
