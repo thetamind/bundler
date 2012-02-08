@@ -72,21 +72,23 @@ module Bundler
           end
         rescue LoadError => e
           $stderr.puts "load error: #{e.message}"
+          REGEXPS.find { |r| r =~ e.message }
+          $stderr.puts "found message: #{$1}"
+          raise if dep.autorequire || $1 != required_file
+
           if dep.autorequire.nil? && dep.name.include?('-')
             begin
               namespaced_file = dep.name.gsub('-', '/')
               $stderr.puts "requiring namespaced file: #{namespaced_file}"
               Kernel.require namespaced_file
-            rescue LoadError
+            rescue LoadError => e
               $stderr.puts "namespaced load error: #{e.message}"
               REGEXPS.find { |r| r =~ e.message }
               $stderr.puts "found message: #{$1}"
               raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
             end
           else
-            REGEXPS.find { |r| r =~ e.message }
-            $stderr.puts "found message: #{$1}"
-            raise if dep.autorequire || $1 != required_file
+            $stderr.puts "did not raise: #{dep.autorequire}"
           end
           $stderr.puts "END: #{dep.name}"
         end
