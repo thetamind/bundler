@@ -225,6 +225,24 @@ describe "Bundler.require" do
         err.should == 'ZOMG LOAD ERROR'
       end
 
+      it "should dump unknown load errors" do
+        build_gem "busted_require", :to_system => true do |s|
+          s.write "lib/busted_require.rb", <<-L
+              $stderr.puts "HELLO FROM INSIDE GEM"
+              raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
+          L
+        end
+
+        install_gemfile <<-G
+            gem "busted_require"
+        G
+        # run "Bundler.require"
+        load_error_run <<-R, 'inotify_init'
+            Bundler.require
+        R
+        err.should == 'ZOMG FUNCTION NOT FOUND'
+      end
+
       describe "with dashes" do
         it "should be busted", focused: true do
           build_gem "busted-require", :to_system => true do |s|
@@ -240,25 +258,24 @@ describe "Bundler.require" do
           R
           err.should == 'ZOMG LOAD ERROR'
         end
-      end
 
-      it "should dump other errors and not die on namespace" do
-        build_gem "busted-require", :to_system => true do |s|
-          s.write "lib/busted-require.rb", <<-L
-            $stderr.puts "HELLO FROM INSIDE GEM"
-            require 'no-such-fileOMG'
-            raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
-          L
+        it "should dump unknown load errors" do
+          build_gem "busted-require", :to_system => true do |s|
+            s.write "lib/busted-require.rb", <<-L
+              $stderr.puts "HELLO FROM INSIDE GEM"
+              raise LoadError, "Function 'inotify_init' not found in [libc.dylib]'"
+            L
+          end
+
+          install_gemfile <<-G
+            gem "busted-require"
+          G
+          # run "Bundler.require"
+          load_error_run <<-R, 'inotify_init'
+            Bundler.require
+          R
+          err.should == 'ZOMG FUNCTION NOT FOUND'
         end
-
-        install_gemfile <<-G
-          gem "busted-require"
-        G
-        # run "Bundler.require"
-        load_error_run <<-R, 'no-such-fileOMG'
-          Bundler.require
-        R
-        err.should == 'ZOMG LOAD ERROR'
       end
     end
   end

@@ -46,8 +46,8 @@ module Spec
         rescue LoadError => e
           if e.message.include?("-- #{name}")
             $stderr.puts("ZOMG LOAD ERROR")
-          #elsif e.message.include?("Function '#{name}' not found in")
-          #  $stderr.puts("ZOMG FUNCTION NOT FOUND")
+          elsif e.message.include?("Function '#{name}' not found in")
+            $stderr.puts("ZOMG FUNCTION NOT FOUND")
           else
             $stderr.puts(e.message)
           end
