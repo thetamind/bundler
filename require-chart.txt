@@ -1,0 +1,23 @@
+G L R E
+u u   l
+u u   O
+D D   l
+D S   l
+D D   O
+D S   O
+
+
+u u     underscores
+D D     dashes
+D S     dash autonamespace
+u   X   underscore require
+D   X   dash require
+
+
+require file
+rescue LoadError e
+  raise if file not in msg
+
+  require namespace file
+  rescue LoadError e
+    raise if namespace file not in namespace msg

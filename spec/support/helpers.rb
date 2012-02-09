@@ -196,6 +196,8 @@ module Spec
 
     alias install_gem install_gems
 
+    def 
+
     def with_gem_path_as(path)
       gem_home, gem_path = ENV['GEM_HOME'], ENV['GEM_PATH']
       ENV['GEM_HOME'], ENV['GEM_PATH'] = path.to_s, path.to_s

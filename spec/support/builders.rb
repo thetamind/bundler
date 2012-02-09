@@ -311,6 +311,21 @@ module Spec
       build_with(GemBuilder, name, args, &blk)
     end
 
+    def build_busted_gem(gem_name, lib_path=gem_name, error=:no_filef)
+      build_gem gem_name, :to_system => true do |s|
+        s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
+      end
+
+      install_gemfile <<-G
+          gem "busted_require"
+      G
+
+      load_error_run <<-R, 'no_such_file_omg'
+          Bundler.require
+      R
+      err.should == 'ZOMG LOAD ERROR'
+    end
+
     def build_git(name, *args, &block)
       opts = args.last.is_a?(Hash) ? args.last : {}
       builder = opts[:bare] ? GitBareBuilder : GitBuilder
