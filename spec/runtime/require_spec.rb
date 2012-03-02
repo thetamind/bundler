@@ -212,7 +212,7 @@ describe "Bundler.require" do
 
   describe "with busted gems" do
     shared_examples_for 'a busted gem' do |name, lib, autorequire|
-      build_gem name, :no_defaults => false, :to_system => true do |s|
+      build_gem name, :no_default => true, :to_system => true do |s|
         s.write "lib/#{lib}.rb", yield
       end
 
@@ -220,17 +220,17 @@ describe "Bundler.require" do
 
     end
     describe "with underscores" do
-      build_busted_gem("busted_require", "busted_require", :require => nil) do
-        require 'no_such_file_omg'
-      end
+      #build_busted_gem("busted_require", "busted_require", :require => nil) do
+      #  require 'no_such_file_omg'
+      #end
     end
     describe "with dashes" do
-      build_busted_gem("busted-require", "busted-require", nil) do
-        require 'no_such_file_omg'
-      end
+      #build_busted_gem("busted-require", "busted-require", nil) do
+      #  require 'no_such_file_omg'
+      #end
 
       describe "that autorequire" do
-        build_busted_gem(:dash, :slash, nil, :load_error)
+        #build_busted_gem(:dash, :slash, nil, :load_error)
       end
     end
   end

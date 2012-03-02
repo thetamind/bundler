@@ -311,13 +311,13 @@ module Spec
       build_with(GemBuilder, name, args, &blk)
     end
 
-    def build_busted_gem(gem_name, lib_path=gem_name, error=:no_filef)
+    def build_busted_gem(gem_name, lib_path=gem_name, autorequire=nil, &block)
       build_gem gem_name, :to_system => true do |s|
-        s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
+        s.write "lib/#{lib_path}.rb", "require 'no_such_file_omg'"
       end
 
       install_gemfile <<-G
-          gem "busted_require"
+          gem "busted_require", "require => '#{autorequire}'"
       G
 
       load_error_run <<-R, 'no_such_file_omg'
