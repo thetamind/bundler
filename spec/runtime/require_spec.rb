@@ -208,22 +208,22 @@ describe "Bundler.require" do
       run "Bundler.require"
       out.should eq("two_not_loaded\none\ntwo")
     end
+  end
 
-    describe "with busted gems" do
-      it "should be busted" do
-        build_gem "busted_require", :to_system => true do |s|
-          s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
-        end
-
-        install_gemfile <<-G
-          gem "busted_require"
-        G
-
-        load_error_run <<-R, 'no_such_file_omg'
-          Bundler.require
-        R
-        err.should == 'ZOMG LOAD ERROR'
+  describe "with busted gems" do
+    it "should be busted" do
+      build_gem "busted_require", :to_system => true do |s|
+        s.write "lib/busted_require.rb", "require 'no_such_file_omg'"
       end
+
+      install_gemfile <<-G
+        gem "busted_require"
+      G
+
+      load_error_run <<-R, 'no_such_file_omg'
+        Bundler.require
+      R
+      err.should == 'ZOMG LOAD ERROR'
     end
   end
 end
