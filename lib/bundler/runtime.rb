@@ -68,20 +68,16 @@ module Bundler
             Kernel.require file
           end
         rescue LoadError => e
-          puts "1LOAD ERROR: #{required_file}: #{e.message}"
           if dep.autorequire.nil? && dep.name.include?('-')
             begin
               namespaced_file = dep.name.gsub('-', '/')
-              puts "REQUIRING: #{namespaced_file}"
               Kernel.require namespaced_file
             rescue LoadError
               REGEXPS.find { |r| r =~ e.message }
-              puts "2LOADERROR: #{e.message}"
               raise if dep.autorequire || $1.gsub('-', '/') != namespaced_file
             end
           else
             REGEXPS.find { |r| r =~ e.message }
-            puts "3LOADERROR: #{e.message}"
             raise if dep.autorequire || $1 != required_file
           end
         end

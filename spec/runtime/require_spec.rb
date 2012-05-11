@@ -223,7 +223,6 @@ describe "Bundler.require" do
       load_error_run <<-R, 'no_such_file_omg'
         Bundler.require
       R
-      out.should == 'hi'
       err.should == 'ZOMG LOAD ERROR'
     end
   end
@@ -240,7 +239,6 @@ describe "Bundler.require" do
       load_error_run <<-R, 'no_such_file_x'
         Bundler.require
       R
-      out.should == 'hi'
       err.should == 'ZOMG LOAD ERROR'
     end
 
@@ -257,7 +255,6 @@ describe "Bundler.require" do
       load_error_run <<-R, 'inotify_init'
         Bundler.require
       R
-      out.should == 'hi'
       err.should == 'ZOMG FUNCTION NOT FOUND'
     end
   end
