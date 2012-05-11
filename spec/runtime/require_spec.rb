@@ -234,7 +234,7 @@ describe "Bundler.require" do
       end
 
       install_gemfile <<-G
-        gem "busted-require"
+        gem "busted-require", :require => 'busted/require'
       G
       load_error_run <<-R, 'no_such_file_x'
         Bundler.require
