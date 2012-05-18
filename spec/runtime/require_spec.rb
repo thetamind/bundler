@@ -250,7 +250,7 @@ describe "Bundler.require" do
       end
 
       install_gemfile <<-G
-        gem "busted-dash"
+        gem "busted-dash", :require => 'busted/dash'
       G
       load_error_run <<-R, 'inotify_init'
         Bundler.require
